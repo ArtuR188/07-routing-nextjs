@@ -1,0 +1,11 @@
+/* app/NotFound.module.css */
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.description {
+  font-size: 16px;
+  opacity: 0.8;
+}
