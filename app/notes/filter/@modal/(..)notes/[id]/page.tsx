@@ -1,27 +1,30 @@
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
-import { fetchNoteById } from "@/lib/api";
-import Modal from "@/components/Modal/Modal";
-import NoteDetailsClient from "@/app/notes/[id]/NoteDetails.client";
+"use client";
 
-type PageProps = {
-  params: Promise<{ id: string }>;
+import { useEffect } from "react";
+import css from "./Modal.module.css";
+
+type Props = {
+  children: React.ReactNode;
+  onClose: () => void;
 };
 
-export default async function NotePreviewModalPage({ params }: PageProps) {
-  const { id } = await params;
+export default function Modal({ children, onClose }: Props) {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
 
-  const queryClient = new QueryClient();
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
 
-  await queryClient.prefetchQuery({
-    queryKey: ["note", id],
-    queryFn: () => fetchNoteById(id),
-  });
+  const onBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) onClose();
+  };
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <Modal>
-        <NoteDetailsClient />
-      </Modal>
-    </HydrationBoundary>
+    <div className={css.backdrop} onClick={onBackdropClick}>
+      <div className={css.modal}>{children}</div>
+    </div>
   );
 }
