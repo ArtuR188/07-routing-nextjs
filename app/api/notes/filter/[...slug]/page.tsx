@@ -1,1 +1,1 @@
-export { default } from "@/app/(private routes)/notes/filter/[...slug]/page";
+export { default } from "@/app/notes/filter/[...slug]/page";
