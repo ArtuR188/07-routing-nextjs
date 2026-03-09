@@ -1,0 +1,1 @@
+export { default } from "@/app/(private routes)/Notes.client";
