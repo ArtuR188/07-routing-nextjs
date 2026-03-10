@@ -1,7 +1,7 @@
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { fetchNotes } from "@/lib/api";
 import type { NoteTag } from "@/types/note";
-import NotesClient from "../../../(private routes)/Notes.client";
+import NotesClient from "./Notes.client";
 
 type PageProps = {
   params: Promise<{ slug?: string[] }>;
@@ -17,19 +17,19 @@ function toNoteTag(value: string | undefined): NoteTag | undefined {
 export default async function FilterNotesPage({ params }: PageProps) {
   const { slug } = await params;
 
-  const selected = slug?.[0]; // "all" або "Work"...
+  const selected = slug?.[0];
   const tag: NoteTag | undefined = selected === "all" ? undefined : toNoteTag(selected);
 
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: ["notes", 1, "", tag], // tag може бути undefined - ОК
+    queryKey: ["notes", 1, "", tag],
     queryFn: () =>
       fetchNotes({
         page: 1,
         perPage: 12,
         search: "",
-        tag, // undefined => в api не має відправлятись
+        tag,
       }),
   });
 
