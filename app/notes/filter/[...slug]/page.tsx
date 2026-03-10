@@ -13,6 +13,21 @@ function toNoteTag(value: string | undefined): NoteTag | undefined {
   if (!value) return undefined;
   return (TAGS as readonly string[]).includes(value) ? (value as NoteTag) : undefined;
 }
+export async function generateMetadata({ params }: PageProps) {
+  const { slug } = await params;
+  const selected = slug?.[0] ?? 'all';
+  const filter = selected === 'all' ? 'All notes' : selected;
+  return {
+    title: `NoteHub | ${filter}`,
+    description: `Notes filtered by: ${filter}`,
+    openGraph: {
+      title: `NoteHub | ${filter}`,
+      description: `Notes filtered by: ${filter}`,
+      url: `https://your-app.vercel.app/notes/filter/${selected}`,
+      images: ['https://ac.goit.global/fullstack/react/notehub-og-meta.jpg'],
+    },
+  };
+}
 
 export default async function FilterNotesPage({ params }: PageProps) {
   const { slug } = await params;
