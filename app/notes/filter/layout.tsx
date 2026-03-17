@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import css from "./LayoutNotes.module.css";
 
 type FilterLayoutProps = {
   children: ReactNode;
@@ -10,7 +11,7 @@ export default function FilterLayout({
   sidebar,
 }: FilterLayoutProps) {
   return (
-    <div>
+    <div className={css.layout}>
       {sidebar}
       {children}
     </div>
