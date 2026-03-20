@@ -6,14 +6,11 @@ type FilterLayoutProps = {
   sidebar: ReactNode;
 };
 
-export default function FilterLayout({
-  children,
-  sidebar,
-}: FilterLayoutProps) {
+export default function FilterLayout({ children, sidebar }: FilterLayoutProps) {
   return (
-    <div className={css.layout}>
-      {sidebar}
-      {children}
-    </div>
+    <section className={css.container}>
+      <aside className={css.sidebar}>{sidebar}</aside>
+      <div className={css.notesWrapper}>{children}</div>
+    </section>
   );
 }

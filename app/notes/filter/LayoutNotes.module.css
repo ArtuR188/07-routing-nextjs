@@ -1,7 +1,14 @@
-.layout {
+.container {
   display: flex;
-  flex-direction: row;
   gap: 2rem;
   padding: 2rem;
   align-items: flex-start;
+}
+
+.sidebar {
+  min-width: 160px;
+}
+
+.notesWrapper {
+  flex: 1;
 }

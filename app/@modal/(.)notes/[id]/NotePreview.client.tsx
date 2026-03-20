@@ -1,35 +1,37 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import Modal from '@/components/Modal/Modal';
-import { fetchNoteById } from '@/lib/api';
+import { useQuery } from "@tanstack/react-query";
+import { useRouter, useParams } from 'next/navigation';
+import { fetchNoteById } from "@/lib/api";
+import Modal from "@/components/Modal/Modal";
 
-interface Props {
-  id: string;
-}
-
-export default function NotePreviewClient({ id }: Props) {
+export default function NotePreviewClient() {
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const handleClose = () => router.back();
 
-  const { data: note, isLoading, isError } = useQuery({
-    queryKey: ['note', id],
+  const { data: note, isLoading, error } = useQuery({
+    queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
     refetchOnMount: false,
   });
 
+  if (isLoading) return <p>Loading, please wait...</p>;
+  if (error instanceof Error || !note) return <p>Something went wrong.</p>;
+
+  const formattedDate = `Created at: ${new Date(note.createdAt).toLocaleDateString()}`;
+
   return (
-    <Modal onClose={() => router.back()}>
-      {isLoading && <p>Loading...</p>}
-      {isError && <p>Something went wrong.</p>}
-      {note && (
+    <Modal closeModal={handleClose}>
+      <div>
         <div>
           <h2>{note.title}</h2>
-          <p>{note.content}</p>
-          <span>{note.tag}</span>
-          <p>{new Date(note.createdAt).toLocaleDateString()}</p>
+          <p>{note.tag}</p>
         </div>
-      )}
+        <p>{note.content}</p>
+        <p>{formattedDate}</p>
+        <button type="button" onClick={handleClose}>Back</button>
+      </div>
     </Modal>
   );
 }
