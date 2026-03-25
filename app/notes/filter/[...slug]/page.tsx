@@ -1,41 +1,57 @@
-import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
-import { fetchNotes } from "@/lib/api";
+import TAGS from "@/constants/noteTags";
+import { notFound } from "next/navigation";
 import type { NoteTag } from "@/types/note";
-import NotesClient from "./Notes.client";
 
-type PageProps = {
-  params: Promise<{ slug?: string[] }>;
-};
+import NotesPageClient from "./NotesPageClient";
 
-const TAGS: NoteTag[] = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
+import { QueryClient, dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { getNotes } from "@/lib/api";
 
-function toNoteTag(value: string | undefined): NoteTag | undefined {
-  if (!value) return undefined;
-  return (TAGS as readonly string[]).includes(value) ? (value as NoteTag) : undefined;
+interface NotesByCategoryParams {
+  slug: string[];
 }
 
-export default async function FilterNotesPage({ params }: PageProps) {
-  const { slug } = await params;
+function isNoteTag(value: string): value is NoteTag {
+  return TAGS.includes(value as NoteTag);
+}
 
-  const selected = slug?.[0];
-  const tag: NoteTag | undefined = selected === "all" ? undefined : toNoteTag(selected);
+const PER_PAGE = 12;
+
+export default async function NotesByCategory({
+  params,
+}: {
+  params: Promise<NotesByCategoryParams>;
+}) {
+  const { slug } = await params;
+  const filter = slug?.[0] ?? "all";
+
+  let tag: NoteTag | undefined;
+
+  if (filter === "all") {
+    tag = undefined;
+  } else if (isNoteTag(filter)) {
+    tag = filter;
+  } else {
+    notFound();
+  }
 
   const queryClient = new QueryClient();
 
+  const queryParams = {
+    page: 1,
+    perPage: PER_PAGE,
+    search: "",
+    tag,
+  };
+
   await queryClient.prefetchQuery({
-    queryKey: ["notes", 1, "", tag],
-    queryFn: () =>
-      fetchNotes({
-        page: 1,
-        perPage: 12,
-        search: "",
-        tag,
-      }),
+    queryKey: ["notes", queryParams],
+    queryFn: () => getNotes(queryParams),
   });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <NotesClient initialTag={tag} />
+      <NotesPageClient tag={tag} />
     </HydrationBoundary>
   );
 }

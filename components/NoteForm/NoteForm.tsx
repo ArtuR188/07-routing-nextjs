@@ -15,7 +15,8 @@ export interface NoteFormValues {
 }
 
 interface NoteFormProps {
-  onCancel: () => void;
+  closeModal: () => void;
+  onCreated?: () => void;
 }
 
 const validationSchema = Yup.object({
@@ -32,7 +33,7 @@ const initialValues: NoteFormValues = {
   tag: "Todo",
 };
 
-export default function NoteForm({ onCancel }: NoteFormProps) {
+export default function NoteForm({ closeModal, onCreated }: NoteFormProps) {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
@@ -46,7 +47,8 @@ export default function NoteForm({ onCancel }: NoteFormProps) {
       await queryClient.invalidateQueries({
         predicate: (q) => q.queryKey[0] === "notes",
       });
-      onCancel(); // закриваємо модалку
+      onCreated?.();
+      closeModal();
     },
   });
 
@@ -101,7 +103,7 @@ export default function NoteForm({ onCancel }: NoteFormProps) {
           </div>
 
           <div className={css.actions}>
-            <button type="button" className={css.cancelButton} onClick={onCancel}>
+            <button type="button" className={css.cancelButton} onClick={closeModal}>
               Cancel
             </button>
 
